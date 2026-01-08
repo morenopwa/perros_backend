@@ -30,41 +30,26 @@ const transporter = nodemailer.createTransport({
 
 // Ruta para recibir el formulario
 app.post('/send-email', (req, res) => {
-  const data = req.body; 
+  const data = req.body;
+  
+  // RASTREO 1: ¿Llegaron los datos al servidor?
+  console.log("==> Intento de envío recibido para:", data.email);
 
-  const mailOptions = {
-    from: process.env.EMAIL_USER,
-    to: 'Perros17peru@gmail.com',
-    subject: `Nueva Solicitud Hangaround: ${data.fullName}`,
-    text: `Detalles del aspirante:
-    - Nombre: ${data.fullName}
-    - Apodo: ${data.nickname}
-    - Edad: ${data.age}
-    - Email: ${data.email}
-    - WhatsApp: ${data.phone}
-    - Ubicación: ${data.city}, ${data.country}
-    - Moto: ${data.bikeModel} (${data.bikeCc}cc)
-    - Otro grupo: ${data.otherGroup} (${data.otherGroupDetail})
-    - Redes: ${data.socialMedia}`
-  };
+  const mailOptions = { ... };
 
-  // --- ESTA ES LA PARTE QUE FALTABA ---
+  // RASTREO 2: ¿Nodemailer está intentando conectar?
+  console.log("==> Iniciando conexión con Gmail...");
+
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
-      console.error("Error de Nodemailer:", error);
-      return res.status(500).json({ 
-        success: false, 
-        message: 'Error al enviar el correo',
-        error: error.message 
-      });
+      // RASTREO 3: ¿Por qué falló Gmail?
+      console.error("==> FALLO EN NODEMAILER:", error.message);
+      return res.status(500).json({ success: false, error: error.message });
     }
-    console.log('Email enviado con éxito: ' + info.response);
-    res.status(200).json({ 
-      success: true, 
-      message: '¡Formulario enviado correctamente!' 
-    });
+    // RASTREO 4: ¡Éxito!
+    console.log("==> ¡ÉXITO! Respuesta de Gmail:", info.response);
+    res.status(200).json({ success: true });
   });
-  // -------------------------------------
 });
 
 const PORT = process.env.PORT || 3001;
