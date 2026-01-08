@@ -6,41 +6,25 @@ require('dotenv').config();
 const app = express();
 
 // Middlewares
-app.use(cors());
+app.use(cors({
+  origin: '*', // Esto permite que cualquier origen (como tu localhost o la web final) se conecte
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type']
+}));
 app.use(express.json());
 
-// Configuración del transporte de Mail (Usando tus variables del .env)
+// Configuración del transporte de Mail
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS, // La contraseña de 16 letras
+    pass: process.env.EMAIL_PASS, // Tu clave de 16 letras de Google
   },
 });
 
 // Ruta para recibir el formulario
 app.post('/send-email', (req, res) => {
-  const { name, email, message } = req.body;
-
-  const mailOptions = {
-    from: process.env.EMAIL_USER,
-    to: 'Perros17peru@gmail.com', // El destino final
-    subject: `Nuevo mensaje de ${name}`,
-    text: `Has recibido un nuevo mensaje desde la web:\n\nNombre: ${name}\nCorreo: ${email}\nMensaje: ${message}`,
-  };
-
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.log(error);
-      return res.status(500).send({ message: 'Error al enviar el correo' });
-    }
-    console.log('Email enviado: ' + info.response);
-    res.status(200).send({ message: '¡Correo enviado con éxito!' });
-  });
-});
-
-app.post('/send-email', (req, res) => {
-  const data = req.body; // Recibe todo el objeto formData
+  const data = req.body; 
 
   const mailOptions = {
     from: process.env.EMAIL_USER,
@@ -57,7 +41,24 @@ app.post('/send-email', (req, res) => {
     - Otro grupo: ${data.otherGroup} (${data.otherGroupDetail})
     - Redes: ${data.socialMedia}`
   };
-  // ... resto del código de transporter.sendMail
+
+  // --- ESTA ES LA PARTE QUE FALTABA ---
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error("Error de Nodemailer:", error);
+      return res.status(500).json({ 
+        success: false, 
+        message: 'Error al enviar el correo',
+        error: error.message 
+      });
+    }
+    console.log('Email enviado con éxito: ' + info.response);
+    res.status(200).json({ 
+      success: true, 
+      message: '¡Formulario enviado correctamente!' 
+    });
+  });
+  // -------------------------------------
 });
 
 const PORT = process.env.PORT || 3001;
