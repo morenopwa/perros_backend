@@ -15,14 +15,19 @@ app.use(express.json());
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 465,
-  secure: true, 
+  secure: true, // Forzamos SSL
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
   tls: {
-    rejectUnauthorized: false
-  }
+    // Esto es clave para que Gmail no rechace la conexión de Render
+    rejectUnauthorized: false,
+    minVersion: "TLSv1.2"
+ },
+  connectionTimeout: 20000, // Aumentamos a 20 segundos
+  greetingTimeout: 15000,
+  socketTimeout: 20000
 });
 
 app.post('/send-email', (req, res) => {
