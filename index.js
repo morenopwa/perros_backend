@@ -15,11 +15,17 @@ app.use(express.json());
 
 // Configuración del transporte de Mail
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true, // true para puerto 465, false para otros puertos
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS, // Tu clave de 16 letras de Google
+    pass: process.env.EMAIL_PASS,
   },
+  tls: {
+    // Esto ayuda a evitar errores de conexión en servidores como Render
+    rejectUnauthorized: false
+  }
 });
 
 // Ruta para recibir el formulario
