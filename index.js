@@ -5,25 +5,23 @@ import { Resend } from "resend";
 
 dotenv.config();
 
-const app = express();
+if (!process.env.RESEND_API_KEY) {
+  console.error("❌ RESEND_API_KEY no está definida");
+  process.exit(1);
+}
 
-// 🔐 Inicializar Resend con la API KEY del .env
+const app = express();
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// 🧱 Middlewares
 app.use(cors());
 app.use(express.json());
 
-// ✅ Ruta de prueba
 app.get("/", (req, res) => {
   res.send("🐺 PERROS MG backend activo");
 });
 
-// 📩 Envío de formulario Hangaround
 app.post("/api/hangaround", async (req, res) => {
   const d = req.body;
-
-  console.log("📥 Datos recibidos:", d);
 
   try {
     await resend.emails.send({
@@ -31,30 +29,26 @@ app.post("/api/hangaround", async (req, res) => {
       to: ["Perros17peru@gmail.com"],
       subject: "🐺 Nuevo Hangaround 17MG",
       html: `
-        <h2>🐕 Nuevo registro Hangaround</h2>
-        <hr />
+        <h2>Nuevo registro Hangaround</h2>
         <p><b>Nombre:</b> ${d.nombre}</p>
         <p><b>Edad:</b> ${d.edad}</p>
-        <p><b>Apodo:</b> ${d.apodo || "—"}</p>
         <p><b>Email:</b> ${d.email}</p>
         <p><b>Celular:</b> ${d.celular}</p>
-        <p><b>Moto:</b> ${d.moto || "—"} (${d.cc || "—"} cc)</p>
-        <br />
-        <small>Formulario enviado desde la web PERROS MG</small>
+        <p><b>Moto:</b> ${d.moto}</p>
+        <p><b>Cilindrada:</b> ${d.cc}</p>
+        <p><b>País:</b> ${d.pais}</p>
+        <p><b>Ciudad:</b> ${d.ciudad}</p>
+        <p><b>Redes:</b> ${d.redes}</p>
       `,
     });
 
     res.json({ ok: true });
-  } catch (error) {
-    console.error("❌ Error Resend:", error);
-    res.status(500).json({
-      ok: false,
-      error: "No se pudo enviar el correo",
-    });
+  } catch (err) {
+    console.error("❌ Error enviando mail:", err);
+    res.status(500).json({ ok: false });
   }
 });
 
-// 🚀 Arranque del servidor
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`🔥 Backend corriendo en puerto ${PORT}`);
