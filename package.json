@@ -1,10 +1,9 @@
 {
-  "name": "perros-mg-web-backend",
+  "name": "perros-mg-backend",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "node --watch index.js",
-    "start": "node index.js"
+    "start": "node server.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
