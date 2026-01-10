@@ -25,8 +25,8 @@ app.post("/api/hangaround", async (req, res) => {
 
   try {
     await resend.emails.send({
-      from: "PERROS MG <perros17.space@gmail.com>",
-      to: ["perros17.space@gmail.com"],
+      from: "PERROS MG <registro@perros17.space>",
+      to: ["perros17peru@gmail.com"],
       subject: "🐺 Nuevo Hangaround 17MG",
       html: `
         <h2>Nuevo registro Hangaround</h2>
